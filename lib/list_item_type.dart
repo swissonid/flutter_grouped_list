@@ -1,0 +1,91 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+sealed class ListItemType {}
+
+class ListItem extends ListItemType {
+  final String title;
+  final Icon icon;
+
+  ListItem({required this.title, required this.icon});
+
+  ListItem copyWith({String? title, Icon? icon}) {
+    return ListItem(title: title ?? this.title, icon: icon ?? this.icon);
+  }
+}
+
+class Group extends ListItemType {
+  final String title;
+  final int level;
+  final bool isOpen;
+  final Icon icon;
+  final List<ListItemType>? children;
+
+  Group({
+    required this.title,
+    this.level = 0,
+    this.isOpen = false,
+    this.icon = const Icon(Icons.headset),
+    this.children,
+  });
+
+  Group toggle() {
+    return copyWith(isOpen: !isOpen);
+  }
+
+  Group copyWith({
+    String? title,
+    bool? isOpen,
+    Icon? icon,
+    List<ListItemType>? children,
+  }) {
+    return Group(
+      title: title ?? this.title,
+      isOpen: isOpen ?? this.isOpen,
+      icon: icon ?? this.icon,
+      children: children ?? this.children,
+    );
+  }
+
+  Group toEmptyGroup() => copyWith(children: []);
+
+  @override
+  bool operator ==(covariant Group other) {
+    if (identical(this, other)) return true;
+
+    return other.title == title &&
+        other.level == level &&
+        other.isOpen == isOpen &&
+        other.icon == icon &&
+        listEquals(other.children, children);
+  }
+
+  @override
+  int get hashCode {
+    return title.hashCode ^
+        level.hashCode ^
+        isOpen.hashCode ^
+        icon.hashCode ^
+        children.hashCode;
+  }
+}
+
+extension ListItemTypFlattend on Iterable<ListItemType> {
+  Iterable<ListItemType> flattened({bool skipClosedSektion = true}) {
+    final flattenedList = <ListItemType>[];
+    for (var listItemType in this) {
+      switch (listItemType) {
+        case Group():
+          final children = listItemType.children?.flattened();
+          flattenedList.add(listItemType.toEmptyGroup());
+          if (children != null) flattenedList.addAll(children);
+          break;
+        case ListItem():
+          flattenedList.add(listItemType);
+          break;
+      }
+    }
+    return flattenedList;
+  }
+}
