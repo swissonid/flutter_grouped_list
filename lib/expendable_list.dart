@@ -27,16 +27,30 @@ Widget createListItem(BuildContext context, ListItemType item) {
                 ?.map((item) => createListItem(context, item))
                 .toList() ??
             [];
-        return ExpansionTile(
-          title: Text(item.title),
-          maintainState: true,
-          children: children,
-        );
+        return ListHeader(title: Text(item.title));
       }
-      return ExpansionTile(title: Text(item.title), maintainState: true);
+      return ListHeader(title: Text(item.title));
 
     case ListItem():
       return ListTile(title: Text(item.title));
+  }
+}
+
+class ListHeader extends StatefulWidget {
+  const ListHeader({super.key, required this.title});
+  final Widget title;
+
+  @override
+  State<ListHeader> createState() => _ListHeaderState();
+}
+
+class _ListHeaderState extends State<ListHeader> {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: widget.title,
+      trailing: IconButton(onPressed: () {}, icon: Icon(Icons.arrow_right)),
+    );
   }
 }
 

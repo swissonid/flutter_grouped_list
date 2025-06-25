@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_grouped_list_items/data_provider.dart';
-import 'package:flutter_grouped_list_items/expendable_list.dart';
+import 'package:flutter_grouped_list_items/event_simpler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,7 +35,7 @@ class MyHomePage extends StatelessWidget {
 
         title: Text(title),
       ),
-      body: ExpendableList(items: itemList),
+      body: EvenSimplerWidget(items: itemList),
     );
   }
 }

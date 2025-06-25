@@ -49,6 +49,7 @@ class Group extends ListItemType {
       title: title ?? this.title,
       isOpen: isOpen ?? this.isOpen,
       icon: icon ?? this.icon,
+      level: level,
       children: children ?? this.children,
     );
   }
@@ -130,5 +131,21 @@ extension ListItemTypFlattend on Iterable<ListItemType> {
       }
     }
     return flattenedList;
+  }
+
+  Iterable<ListItemType> toggleGroup(String groupTitle) {
+    return map((item) {
+      if (item is Group) {
+        if (item.title == groupTitle) {
+          // Found the target group - toggle it
+          return item.toggle();
+        } else if (item.children != null) {
+          // Not the target, but check children recursively
+          final updatedChildren = item.children!.toggleGroup(groupTitle);
+          return item.copyWith(children: updatedChildren.toList());
+        }
+      }
+      return item; // ListItem - return as is
+    });
   }
 }
