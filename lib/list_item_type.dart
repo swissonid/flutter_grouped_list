@@ -6,12 +6,17 @@ sealed class ListItemType {}
 
 class ListItem extends ListItemType {
   final String title;
-  final Icon icon;
+  final Icon? icon;
 
-  ListItem({required this.title, required this.icon});
+  ListItem({required this.title, this.icon});
 
   ListItem copyWith({String? title, Icon? icon}) {
     return ListItem(title: title ?? this.title, icon: icon ?? this.icon);
+  }
+
+  @override
+  String toString() {
+    return title;
   }
 }
 
@@ -25,7 +30,7 @@ class Group extends ListItemType {
   Group({
     required this.title,
     this.level = 0,
-    this.isOpen = false,
+    this.isOpen = true,
     this.icon = const Icon(Icons.headset),
     this.children,
   });
@@ -69,18 +74,56 @@ class Group extends ListItemType {
         icon.hashCode ^
         children.hashCode;
   }
+
+  @override
+  String toString() {
+    return title;
+  }
 }
 
 extension ListItemTypFlattend on Iterable<ListItemType> {
-  Iterable<ListItemType> flattened({bool skipClosedSektion = true}) {
+  Iterable<ListItemType> flattened({bool skipClosedSection = true}) {
+    bool shouldSkip(Group group, Iterable<ListItemType>? children) {
+      if (children == null) return true;
+      if (!group.isOpen && skipClosedSection) return true;
+      return false;
+    }
+
     final flattenedList = <ListItemType>[];
+
     for (var listItemType in this) {
       switch (listItemType) {
         case Group():
-          final children = listItemType.children?.flattened();
+          final children = listItemType.children;
           flattenedList.add(listItemType.toEmptyGroup());
-          if (children != null) flattenedList.addAll(children);
+
+          if (shouldSkip(listItemType, children)) break;
+
+          // Separate direct children into groups and items
+          final directGroups = <Group>[];
+          final directItems = <ListItem>[];
+
+          for (var child in children!) {
+            switch (child) {
+              case Group():
+                directGroups.add(child);
+                break;
+              case ListItem():
+                directItems.add(child);
+                break;
+            }
+          }
+
+          // Add direct items first
+          flattenedList.addAll(directItems);
+
+          // Then recursively flatten direct groups
+          flattenedList.addAll(
+            directGroups.flattened(skipClosedSection: skipClosedSection),
+          );
+
           break;
+
         case ListItem():
           flattenedList.add(listItemType);
           break;

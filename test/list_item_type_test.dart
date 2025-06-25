@@ -33,6 +33,51 @@ final nestedGroupWithItems = Group(
     ...onlyItems,
   ],
 );
+
+final groupLevelOneItems = [
+  ListItem(
+    title: 'TestGroup - Level 1 - Item 1',
+    icon: Icon(Icons.abc_rounded),
+  ),
+  ListItem(
+    title: 'TestGroup - Level 1 - Item 2',
+    icon: Icon(Icons.abc_rounded),
+  ),
+  ListItem(
+    title: 'TestGroup - Level 1 - Item 3',
+    icon: Icon(Icons.abc_rounded),
+  ),
+];
+
+final nestedGroupWithItemsButClosed = Group(
+  title: 'TestGroup - Level 0',
+  children: [
+    Group(
+      title: 'TestGroup - Level 1',
+      isOpen: false,
+      children: [
+        Group(title: 'TestGroup - Level 2', children: [ListItem(title: "")]),
+        ...groupLevelOneItems,
+      ],
+    ),
+    ...onlyItems,
+  ],
+);
+
+final nestedGroupWithItemsOpen = Group(
+  title: 'TestGroup - Level 0',
+  children: [
+    Group(
+      title: 'TestGroup - Level 1',
+      isOpen: true,
+      children: [
+        Group(title: 'TestGroup - Level 2', children: [ListItem(title: "")]),
+        ...groupLevelOneItems,
+      ],
+    ),
+    ...onlyItems,
+  ],
+);
 void main() {
   group('flattened tests', () {
     test('should flatten 3 layer into one', () {
@@ -81,6 +126,30 @@ void main() {
           ...onlyItems,
           Group(title: 'TestGroup - Level 2').toEmptyGroup(),
           ...onlyItems,
+        ]),
+      );
+    });
+
+    test('Nested group with itmes should end up in flatt list', () {
+      expect(
+        [nestedGroupWithItems].flattened(),
+        containsAllInOrder([
+          Group(title: 'TestGroup - Level 0').toEmptyGroup(),
+          ...onlyItems,
+          Group(title: 'TestGroup - Level 1').toEmptyGroup(),
+          ...onlyItems,
+          Group(title: 'TestGroup - Level 2').toEmptyGroup(),
+          ...onlyItems,
+        ]),
+      );
+    });
+    test('Nested group with itmes should end up in flatt list 2', () {
+      expect(
+        [nestedGroupWithItemsButClosed].flattened(),
+        containsAllInOrder([
+          Group(title: 'TestGroup - Level 0').toEmptyGroup(),
+          ...onlyItems,
+          Group(title: 'TestGroup - Level 1', isOpen: false).toEmptyGroup(),
         ]),
       );
     });
