@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_grouped_list_items/data_provider.dart';
-import 'package:flutter_grouped_list_items/event_simpler.dart';
+import 'package:flutter_grouped_list_items/even_simpler.dart';
 
 void main() {
   runApp(const MyApp());

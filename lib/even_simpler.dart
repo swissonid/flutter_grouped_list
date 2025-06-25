@@ -38,17 +38,21 @@ class _EvenSimplerWidgetState extends State<EvenSimplerWidget> {
           case Group():
             final tileColor =
                 Colors.deepPurple[item.level * 100] ?? Colors.deepPurple;
-            final textColor =
-                tileColor.computeLuminance() >= 0.179
-                    ? Colors.black
-                    : Colors.white;
+
+            final isToDark = tileColor.computeLuminance() >= 0.179;
+            final textAndIconColor = isToDark ? Colors.black : Colors.white;
+
             return ListTile(
               title: Text(
                 item.title,
-                style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: textAndIconColor,
+                ),
               ),
               trailing: Icon(
                 item.isOpen ? Icons.expand_less : Icons.expand_more,
+                color: textAndIconColor,
               ),
               onTap: () => toggleAndRefresh(item.title),
               tileColor: tileColor,
